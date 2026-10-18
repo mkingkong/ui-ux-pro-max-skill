@@ -1,0 +1,1563 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ارائه پایان‌نامه: آموزش اثرسازی، قصد کارآفرینانه و شناسایی فرصت | PLS-SEM & fsQCA</title>
+    <style>
+        /* CSS Reset & Variables */
+        :root {
+            --bg-space: #030712;
+            --bg-space-radial: radial-gradient(circle at 50% 50%, #0f172a 0%, #030712 100%);
+            --color-sun: #fbbf24;
+            --color-sun-glow: rgba(251, 191, 36, 0.45);
+
+            /* Planet Colors */
+            --p1-color: #38bdf8;
+            --p2-color: #a78bfa;
+            --p3-color: #34d399;
+            --p4-color: #f472b6;
+            --p5-color: #fb923c;
+            --p6-color: #c084fc;
+            --p7-color: #2dd4bf;
+
+            --text-main: #f3f4f6;
+            --text-muted: #9ca3af;
+            --glass-bg: rgba(15, 23, 42, 0.82);
+            --glass-border: rgba(255, 255, 255, 0.14);
+            --glass-glow: rgba(56, 189, 248, 0.15);
+
+            --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Tahoma", sans-serif;
+            --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, ::before, ::after {
+                animation: none !important;
+                transition: none !important;
+                scroll-behavior: auto !important;
+            }
+            .orbit-line, .sun-node, .planet-node {
+                animation: none !important;
+            }
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-space);
+            background-image: var(--bg-space-radial);
+            color: var(--text-main);
+            font-family: var(--font-family);
+            min-height: 100vh;
+            overflow-x: hidden;
+            line-height: 1.6;
+            direction: rtl;
+        }
+
+        /* LTR isolate wrapper for technical terms */
+        .ltr-term {
+            direction: ltr;
+            display: inline-block;
+            unicode-bidi: isolate;
+            font-family: Arial, sans-serif;
+            font-weight: 600;
+        }
+
+        /* Space Viewport Setup */
+        #viewport {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 1;
+            perspective: 1200px;
+            overflow: hidden;
+        }
+
+        /* Cosmic Starfield */
+        .starfield {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background:
+                radial-gradient(1.5px 1.5px at 15% 25%, #ffffff, rgba(0,0,0,0)),
+                radial-gradient(2px 2px at 35% 65%, rgba(255,255,255,0.85), rgba(0,0,0,0)),
+                radial-gradient(1px 1px at 75% 35%, rgba(255,255,255,0.9), rgba(0,0,0,0)),
+                radial-gradient(2px 2px at 85% 80%, rgba(255,255,255,0.7), rgba(0,0,0,0)),
+                radial-gradient(1.5px 1.5px at 55% 95%, rgba(255,255,255,0.8), rgba(0,0,0,0));
+            background-repeat: repeat;
+            background-size: 500px 500px;
+            opacity: 0.55;
+        }
+
+        /* Solar System Stage Container */
+        #solar-system-stage {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 1800px;
+            height: 1800px;
+            margin-top: -900px;
+            margin-left: -900px;
+            transform-style: preserve-3d;
+            transition: transform 0.1s cubic-bezier(0.1, 0.8, 0.2, 1);
+            pointer-events: auto;
+        }
+
+        /* Orbital Lines */
+        .orbit-line {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            border: 1px dashed rgba(255, 255, 255, 0.14);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            transition: border-color 0.3s ease;
+        }
+        .orbit-line.active {
+            border-color: rgba(251, 191, 36, 0.45);
+            border-style: solid;
+        }
+
+        /* Sun Node */
+        .sun-node {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 160px;
+            height: 160px;
+            margin-top: -80px;
+            margin-left: -80px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 35% 35%, #fffbeb 0%, #fbbf24 50%, #d97706 100%);
+            box-shadow: 0 0 50px var(--color-sun-glow), 0 0 100px rgba(251, 191, 36, 0.25);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            font-weight: bold;
+            color: #0f172a;
+            padding: 12px;
+            font-size: 0.88rem;
+            z-index: 10;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .sun-node:hover {
+            transform: scale(1.08);
+            box-shadow: 0 0 70px var(--color-sun-glow), 0 0 140px rgba(251, 191, 36, 0.4);
+        }
+
+        /* Planet Node */
+        .planet-node {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: transform 0.4s ease, filter 0.4s ease, opacity 0.4s ease;
+            box-shadow: 0 0 25px rgba(0,0,0,0.6);
+            z-index: 5;
+            color: #ffffff;
+            text-align: center;
+            font-weight: bold;
+            font-size: 0.82rem;
+            user-select: none;
+        }
+        .planet-node .planet-label {
+            position: absolute;
+            top: 100%;
+            margin-top: 10px;
+            white-space: nowrap;
+            font-size: 0.82rem;
+            font-weight: 600;
+            background: rgba(3, 7, 18, 0.85);
+            padding: 3px 12px;
+            border-radius: 20px;
+            border: 1px solid rgba(255,255,255,0.15);
+            color: var(--text-main);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            pointer-events: none;
+        }
+        .planet-node.active-planet {
+            transform: scale(1.35) !important;
+            filter: drop-shadow(0 0 20px currentColor);
+            z-index: 25;
+        }
+        .planet-node.active-planet .planet-label {
+            border-color: currentColor;
+            color: #ffffff;
+        }
+
+        /* Moon Nodes */
+        .moon-node {
+            position: absolute;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.85);
+            box-shadow: 0 0 10px rgba(255,255,255,0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.72rem;
+            color: #0f172a;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.3s ease, background-color 0.3s ease;
+            z-index: 6;
+        }
+        .moon-node:hover {
+            transform: scale(1.35);
+            background: #ffffff;
+        }
+
+        /* Navigation Overlay Bar */
+        #nav-panel {
+            position: fixed;
+            top: 18px;
+            right: 20px;
+            left: 20px;
+            z-index: 100;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(15, 23, 42, 0.88);
+            border: 1px solid var(--glass-border);
+            border-radius: 50px;
+            padding: 8px 22px;
+            backdrop-filter: blur(14px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .brand-title {
+            font-size: 0.92rem;
+            font-weight: bold;
+            color: var(--color-sun);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 6px;
+            list-style: none;
+            overflow-x: auto;
+            max-width: 52%;
+            padding: 4px 0;
+            scrollbar-width: none;
+        }
+        .nav-links::-webkit-scrollbar {
+            display: none;
+        }
+
+        .nav-item {
+            font-size: 0.8rem;
+            padding: 5px 14px;
+            border-radius: 20px;
+            cursor: pointer;
+            white-space: nowrap;
+            background: rgba(255,255,255,0.06);
+            color: var(--text-muted);
+            transition: var(--transition-smooth);
+            border: 1px solid transparent;
+        }
+        .nav-item.active, .nav-item:hover {
+            background: var(--color-sun);
+            color: #0f172a;
+            font-weight: bold;
+            border-color: rgba(255,255,255,0.3);
+        }
+
+        .progress-indicator {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+        .progress-bar-bg {
+            width: 80px;
+            height: 6px;
+            background: rgba(255,255,255,0.12);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+        .progress-bar-fill {
+            height: 100%;
+            width: 0%;
+            background: var(--color-sun);
+            transition: width 0.15s ease;
+        }
+
+        .btn-action {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid var(--glass-border);
+            color: var(--text-main);
+            padding: 6px 14px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: var(--transition-smooth);
+            font-family: inherit;
+        }
+        .btn-action:hover {
+            background: rgba(255,255,255,0.22);
+            border-color: rgba(255,255,255,0.3);
+        }
+
+        /* Keyboard Shortcuts Panel Floating Button */
+        #kbd-help-btn {
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            z-index: 100;
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            color: var(--color-sun);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            cursor: pointer;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.5);
+            transition: var(--transition-smooth);
+        }
+        #kbd-help-btn:hover {
+            transform: scale(1.1);
+            border-color: var(--color-sun);
+        }
+
+        /* Keyboard Shortcuts Help Dialog */
+        #kbd-help-modal {
+            position: fixed;
+            bottom: 80px;
+            right: 25px;
+            z-index: 101;
+            background: rgba(15, 23, 42, 0.95);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 16px 20px;
+            width: 280px;
+            backdrop-filter: blur(16px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.7);
+            display: none;
+        }
+        .kbd-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.82rem;
+            margin: 8px 0;
+            color: var(--text-muted);
+        }
+        kbd {
+            background: rgba(255,255,255,0.12);
+            padding: 2px 8px;
+            border-radius: 6px;
+            color: var(--text-main);
+            font-size: 0.75rem;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        /* Scroll Content Styling */
+        #scroll-container {
+            position: relative;
+            z-index: 2;
+            width: 100%;
+        }
+
+        .scroll-section {
+            min-height: 100vh;
+            padding: 100px 20px 60px 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            max-width: 1100px;
+            margin: 0 auto;
+            pointer-events: auto;
+        }
+
+        /* Sun Intro Hero Card */
+        .intro-hero {
+            text-align: center;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            padding: 45px 35px;
+            border-radius: 28px;
+            backdrop-filter: blur(16px);
+            box-shadow: 0 25px 60px rgba(0,0,0,0.6);
+            margin-top: 5vh;
+            margin-bottom: 15vh;
+            width: 100%;
+        }
+        .intro-hero h1 {
+            font-size: 1.85rem;
+            margin-bottom: 22px;
+            color: var(--color-sun);
+            line-height: 1.55;
+            font-weight: 800;
+        }
+        .intro-hero .meta-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 18px;
+            margin: 30px 0;
+            text-align: right;
+            border-top: 1px dashed rgba(255,255,255,0.15);
+            padding-top: 25px;
+        }
+        .meta-item {
+            font-size: 0.95rem;
+            background: rgba(0,0,0,0.25);
+            padding: 12px 16px;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.06);
+        }
+        .meta-item span {
+            color: var(--text-muted);
+            display: block;
+            font-size: 0.78rem;
+            margin-bottom: 4px;
+        }
+
+        .tag-pill {
+            display: inline-block;
+            background: rgba(251, 191, 36, 0.12);
+            color: var(--color-sun);
+            border: 1px solid rgba(251, 191, 36, 0.3);
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        /* Chapter Card Container */
+        .chapter-container {
+            width: 100%;
+            margin-bottom: 100px;
+        }
+
+        .chapter-header-card {
+            background: var(--glass-bg);
+            border-right: 5px solid var(--chapter-accent, var(--p1-color));
+            border-top: 1px solid var(--glass-border);
+            border-bottom: 1px solid var(--glass-border);
+            border-left: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 28px;
+            margin-bottom: 35px;
+            backdrop-filter: blur(14px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.4);
+        }
+        .chapter-header-card h2 {
+            font-size: 1.6rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            color: var(--chapter-accent, #38bdf8);
+            margin-bottom: 10px;
+        }
+        .chapter-badge {
+            font-size: 0.82rem;
+            padding: 5px 14px;
+            border-radius: 20px;
+            background: rgba(255,255,255,0.1);
+            color: var(--text-main);
+            font-weight: normal;
+        }
+
+        /* Moons Grid */
+        .moons-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 24px;
+        }
+
+        .moon-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 18px;
+            padding: 24px;
+            backdrop-filter: blur(12px);
+            transition: var(--transition-smooth);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .moon-card:hover {
+            border-color: var(--chapter-accent, #38bdf8);
+            transform: translateY(-4px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+        }
+        .moon-card h3 {
+            font-size: 1.15rem;
+            margin-bottom: 14px;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            padding-bottom: 10px;
+        }
+        .moon-card p {
+            font-size: 0.93rem;
+            color: var(--text-muted);
+            margin-bottom: 16px;
+            line-height: 1.65;
+        }
+
+        /* Metrics & Stats Display */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+            gap: 12px;
+            margin-top: 15px;
+        }
+        .stat-box {
+            background: rgba(3, 7, 18, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 12px;
+            text-align: center;
+        }
+        .stat-box .val {
+            font-size: 1.25rem;
+            font-weight: bold;
+            color: var(--chapter-accent, #38bdf8);
+            direction: ltr;
+        }
+        .stat-box .lbl {
+            font-size: 0.76rem;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        /* SVG Diagrams & Model Visualization */
+        .svg-diagram-container {
+            width: 100%;
+            background: rgba(3, 7, 18, 0.85);
+            border: 1px solid var(--glass-border);
+            border-radius: 14px;
+            padding: 18px;
+            margin-top: 15px;
+            overflow-x: auto;
+        }
+        .interactive-node {
+            cursor: pointer;
+            transition: transform 0.2s ease, filter 0.2s ease;
+        }
+        .interactive-node:hover {
+            filter: brightness(1.25);
+        }
+        .interactive-path {
+            cursor: pointer;
+            transition: stroke-width 0.2s ease, stroke 0.2s ease;
+        }
+        .interactive-path:hover {
+            stroke-width: 3.5;
+            stroke: var(--color-sun);
+        }
+
+        /* Data Tables */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.88rem;
+            margin-top: 12px;
+        }
+        .data-table th, .data-table td {
+            padding: 10px 14px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+        }
+        .data-table th {
+            background: rgba(255, 255, 255, 0.06);
+            color: var(--text-main);
+            font-weight: 600;
+        }
+        .data-table tr:hover {
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        /* Modal / Detail Tooltip Panel */
+        #detail-modal {
+            position: fixed;
+            bottom: 30px;
+            left: 30px;
+            z-index: 200;
+            background: rgba(15, 23, 42, 0.95);
+            border: 1px solid var(--color-sun);
+            border-radius: 16px;
+            padding: 16px 20px;
+            max-width: 320px;
+            backdrop-filter: blur(16px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.8);
+            display: none;
+            animation: fadeInModal 0.25s ease-out forwards;
+        }
+        @keyframes fadeInModal {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* fsQCA Truth Matrix Condition Icons */
+        .qca-symbol {
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 24px;
+            font-size: 0.78rem;
+            font-weight: bold;
+            user-select: none;
+        }
+        .qca-present { background: #10b981; color: #042f2e; }
+        .qca-absent { background: #ef4444; color: #450a0a; }
+        .qca-dontcare { background: #6b7280; color: #f3f4f6; }
+
+        /* Responsive Breakpoints */
+        @media (max-width: 992px) {
+            #solar-system-stage {
+                transform: scale(0.75);
+            }
+        }
+
+        @media (max-width: 768px) {
+            #nav-panel {
+                flex-direction: column;
+                gap: 12px;
+                border-radius: 20px;
+                padding: 12px 18px;
+            }
+            .nav-links {
+                max-width: 100%;
+                width: 100%;
+                justify-content: flex-start;
+            }
+            .intro-hero {
+                padding: 30px 20px;
+            }
+            .intro-hero h1 {
+                font-size: 1.4rem;
+            }
+            .sun-node {
+                width: 120px;
+                height: 120px;
+                margin-top: -60px;
+                margin-left: -60px;
+                font-size: 0.76rem;
+            }
+            .moons-grid {
+                grid-template-columns: 1fr;
+            }
+            .chapter-header-card h2 {
+                font-size: 1.3rem;
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Top Navigation Bar -->
+    <nav id="nav-panel">
+        <div class="brand-title" id="btn-brand-home">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="5" fill="#fbbf24"/>
+                <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+            </svg>
+            <span>منظومه پژوهش</span>
+        </div>
+        <ul class="nav-links" id="nav-chapters-list">
+            <!-- Dynamic Nav Chapters -->
+        </ul>
+        <div class="progress-indicator">
+            <button class="btn-action" id="btn-reset-view">نمای کلی</button>
+            <div class="progress-bar-bg">
+                <div class="progress-bar-fill" id="progress-fill"></div>
+            </div>
+            <span id="progress-text">۰٪</span>
+        </div>
+    </nav>
+
+    <!-- Floating Keyboard Shortcuts Trigger Button -->
+    <button id="kbd-help-btn" title="راهنمای کلیدهای میان‌بر">؟</button>
+
+    <!-- Keyboard Shortcuts Modal -->
+    <div id="kbd-help-modal">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 6px;">
+            <strong style="color: var(--color-sun); font-size: 0.88rem;">کلیدهای میان‌بر</strong>
+            <span id="kbd-close" style="cursor: pointer; color: var(--text-muted); font-weight: bold;">✕</span>
+        </div>
+        <div class="kbd-row">
+            <span>فصل بعدی</span>
+            <kbd>↓ / ArrowDown</kbd>
+        </div>
+        <div class="kbd-row">
+            <span>فصل قبلی</span>
+            <kbd>↑ / ArrowUp</kbd>
+        </div>
+        <div class="kbd-row">
+            <span>بازگشت به خورشید</span>
+            <kbd>Home / Esc</kbd>
+        </div>
+    </div>
+
+    <!-- 3D Space Viewport Engine -->
+    <div id="viewport">
+        <div class="starfield"></div>
+        <div id="solar-system-stage">
+            <div class="sun-node" id="sun-element">
+                خورشید پژوهش<br>آموزش اثرسازی
+            </div>
+            <!-- Dynamic Orbits and Planets will be injected here -->
+        </div>
+    </div>
+
+    <!-- Scrollable Narrated Content Area -->
+    <div id="scroll-container">
+        <!-- Sun Hero Section -->
+        <section class="scroll-section" id="section-planet-0">
+            <div class="intro-hero">
+                <h1 id="thesis-main-title">...</h1>
+                <p id="thesis-summary" style="color: var(--text-muted); font-size: 1.05rem; margin-bottom: 20px;"></p>
+
+                <div class="meta-grid">
+                    <div class="meta-item">
+                        <span>پژوهشگر</span>
+                        <strong id="meta-researcher">-</strong>
+                    </div>
+                    <div class="meta-item">
+                        <span>استاد راهنما</span>
+                        <strong id="meta-supervisor">-</strong>
+                    </div>
+                    <div class="meta-item">
+                        <span>دانشگاه / دانشکده</span>
+                        <strong id="meta-university">-</strong>
+                    </div>
+                    <div class="meta-item">
+                        <span>سال ارائه</span>
+                        <strong id="meta-year">-</strong>
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 20px;" id="core-concepts-tags">
+                    <!-- Core concept pills -->
+                </div>
+
+                <div style="margin-top: 30px;">
+                    <button class="btn-action" style="padding: 12px 28px; font-size: 0.95rem; background: var(--color-sun); color: #0f172a; font-weight: bold; border: none;" id="btn-start-journey">
+                        شروع سفر پژوهش ↓
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Dynamic Chapter Sections Container -->
+        <div id="chapters-content-container"></div>
+    </div>
+
+    <!-- Interactive Node Details Tooltip Modal -->
+    <div id="detail-modal">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+            <strong id="modal-title" style="color: var(--color-sun); font-size: 0.9rem;">جزئیات رابطه</strong>
+            <span id="modal-close" style="cursor: pointer; color: var(--text-muted); font-weight: bold;">✕</span>
+        </div>
+        <div id="modal-body" style="font-size: 0.82rem; color: var(--text-main);">...</div>
+    </div>
+
+    <!-- Central Data Object & Logic -->
+    <script>
+        const RESEARCH_DATA = {
+            meta: {
+                title: "بررسی تأثیر آموزش اثرسازی (Effectuation) بر قصد کارآفرینانه و شناسایی فرصت در دانشجویان، با استفاده از روش‌های PLS-SEM و fsQCA",
+                summary: "این پژوهش به بررسی نقش رویکرد تصمیم‌گیری اثرسازی در شکل‌گیری قصد کارآفرینانه و توانایی شناسایی فرصت‌های کسب‌وکار در میان دانشجویان دانشگاه پرداخته و با تلفیق مدل‌سازی معادلات ساختاری حداقل مربعات جزئی (PLS-SEM) و تحلیل مقایسه‌ای کیفی مجموعه‌های فازی (fsQCA)، الگوی خطی و پیکربندی‌های غیرخطی منتهی به پیامد را تبیین می‌نماید.",
+                researcher: "نام پژوهشگر (قابل ویرایش)",
+                supervisor: "استاد راهنما (قابل ویرایش)",
+                university: "دانشگاه / دانشکده مدیریت و کارآفرینی",
+                year: "۱۴۰۳ - ۱۴۰۴",
+                coreConcepts: [
+                    "آموزش اثرسازی (Effectuation)",
+                    "قصد کارآفرینانه (Entrepreneurial Intention)",
+                    "شناسایی فرصت (Opportunity Identification)",
+                    "روش ترکیبی PLS-SEM & fsQCA"
+                ]
+            },
+            chapters: [
+                {
+                    id: "ch-1",
+                    number: 1,
+                    planetId: "planet-1",
+                    title: "مسئله و اهداف پژوهش",
+                    shortTitle: "مسئله و اهداف",
+                    color: "#38bdf8",
+                    orbitRadius: 220,
+                    planetSize: 50,
+                    description: "تبیین ضرورت، اهمیت، شکاف پژوهشی، سوالات و اهداف اصلی تحقیق در حوزه آموزش اثرسازی.",
+                    moons: [
+                        {
+                            id: "m-1-1",
+                            title: "۱. زمینه و مسئله اصلی پژوهش",
+                            shortTitle: "مسئله اصلی",
+                            description: "محیط‌های کسب‌وکار امروزی با عدم قطعیت بالا مواجه‌اند. رویکردهای سنتی پیش‌بینی‌محور (Causal) در آموزش کارآفرینی پاسخگوی نیاز دانشجویان در مواجهه با عدم قطعیت نیستند.",
+                            contentType: "text",
+                            content: "پژوهش حاضر به بررسی این مسئله می‌پردازد که آیا آموزش اصول اثرسازی (توسعه‌یافته توسط ساراسواتی) شامل اصل وسایل موجود، زیان قابل تحمل، اهرم‌سازی ناپایداری‌ها و شراکت‌های راهبردی می‌تواند قصد کارآفرینانه و توانایی شناسایی فرصت را تقویت کند یا خیر."
+                        },
+                        {
+                            id: "m-1-2",
+                            title: "۲. اهمیت موضوع و شکاف پژوهشی",
+                            shortTitle: "شکاف پژوهشی",
+                            description: "شناسایی خلاءهای نظری و روش‌شناختی موجود در ادبیات آموزش کارآفرینی.",
+                            contentType: "metrics",
+                            content: "اکثر تحقیقات گذشته روابط را تک‌علتی و خطی فرض کرده‌اند، در حالی که تصمیم‌گیری کارآفرینانه ماهیتاً متکی بر ترکیب‌های چندگانه و غیرخطی شرایط است.",
+                            data: {
+                                stats: [
+                                    { label: "تمرکز گذشته", value: "خطی / Cause" },
+                                    { label: "رویکرد جدید", value: "پیکربندی / fsQCA" },
+                                    { label: "جامعه هدف", value: "دانشجویان" }
+                                ]
+                            }
+                        },
+                        {
+                            id: "m-1-3",
+                            title: "۳. سؤالات اصلی پژوهش",
+                            shortTitle: "سؤالات پژوهش",
+                            description: "پرسش‌های کلیدی که این پژوهش در صدد پاسخگویی به آن‌هاست.",
+                            contentType: "text",
+                            content: "۱. آیا آموزش اثرسازی بر قصد کارآفرینانه دانشجویان تأثیر معنی‌داری دارد؟<br>۲. آیا آموزش اثرسازی بر شناسایی فرصت تأثیر معنی‌داری دارد؟<br>۳. چه ترکیبی از ابعاد اثرسازی (پیکربندی‌ها) منجر به قصد کارآفرینانه بالا می‌شوند؟"
+                        },
+                        {
+                            id: "m-1-4",
+                            title: "۴. اهداف پژوهش",
+                            shortTitle: "اهداف",
+                            description: "اهداف علمی و کاربردی مشخص‌شده برای آزمون تجربه‌محور.",
+                            contentType: "text",
+                            content: "• سنجش تجربی ضرایب مسیر میان آموزش اثرسازی، شناسایی فرصت و قصد کارآفرینانه با <span class='ltr-term'>PLS-SEM</span>.<br>• کشف مسیرهای متعدد و جایگزین موفقیت (<span class='ltr-term'>Equifinality</span>) با روش <span class='ltr-term'>fsQCA</span>."
+                        }
+                    ]
+                },
+                {
+                    id: "ch-2",
+                    number: 2,
+                    planetId: "planet-2",
+                    title: "مبانی نظری و مدل مفهومی",
+                    shortTitle: "مبانی نظری",
+                    color: "#a78bfa",
+                    orbitRadius: 320,
+                    planetSize: 58,
+                    description: "مرور ادبیات نظری اثرسازی، قصد کارآفرینانه، شناسایی فرصت و تدوین مدل مفهومی پژوهش.",
+                    moons: [
+                        {
+                            id: "m-2-1",
+                            title: "۱. نظریه اثرسازی (Effectuation Theory)",
+                            shortTitle: "نظریه اثرسازی",
+                            description: "اصول ۵گانه اثرسازی ساراسواتی در مقابل رویکرد علیتی (Causation).",
+                            contentType: "text",
+                            content: "نظریه اثرسازی بر کنترل آینده به‌جای پیش‌بینی آن تاکید دارد. ۵ اصل اصلی شامل: اصل پر در دست (Bird-in-Hand)، زیان قابل تحمل (Affordable Loss)، تکه‌های جادویی / شراکت (Crazy Quilt)، لیموناد / اهرم‌سازی سورپرایزها (Lemonade) و خلبان در هواپیما (Pilot-in-the-Plane) است."
+                        },
+                        {
+                            id: "m-2-2",
+                            title: "۲. مدل مفهومی پژوهش",
+                            shortTitle: "مدل مفهومی",
+                            description: "روابط پیشنهادی میان سازه‌های پژوهش (روی مسیرها کلیک کنید).",
+                            contentType: "model",
+                            content: "نمودار زیر مدل مفهومی تدوین‌شده بر اساس ادبیات پژوهش را نشان می‌دهد:",
+                            data: {
+                                nodes: ["آموزش اثرسازی", "شناسایی فرصت", "قصد کارآفرینانه"],
+                                relationships: [
+                                    { from: "آموزش اثرسازی", to: "شناسایی فرصت", label: "H1", desc: "فرضیه ۱: تأثیر مستقیم آموزش اثرسازی بر توانایی شناسایی فرصت" },
+                                    { from: "آموزش اثرسازی", to: "قصد کارآفرینانه", label: "H2", desc: "فرضیه ۲: تأثیر مستقیم آموزش اثرسازی بر قصد کارآفرینانه" },
+                                    { from: "شناسایی فرصت", to: "قصد کارآفرینانه", label: "H3", desc: "فرضیه ۳: تأثیر شناسایی فرصت بر قصد کارآفرینانه" }
+                                ]
+                            }
+                        },
+                        {
+                            id: "m-2-3",
+                            title: "۳. فرضیه‌های پژوهش",
+                            shortTitle: "فرضیه‌ها",
+                            description: "فهرست فرضیه‌های مدون قبل از آزمون تجربی.",
+                            contentType: "table",
+                            content: "فرضیه‌های پژوهش بر اساس روابط ساختاری زیر شکل گرفته‌اند:",
+                            data: {
+                                headers: ["کد فرضیه", "عنوان فرضیه", "جهت متغیرها"],
+                                rows: [
+                                    ["H1", "آموزش اثرسازی بر شناسایی فرصت دانشجویان تأثیر مثبت دارد.", "آموزش اثرسازی ← شناسایی فرصت"],
+                                    ["H2", "آموزش اثرسازی بر قصد کارآفرینانه دانشجویان تأثیر مثبت دارد.", "آموزش اثرسازی ← قصد کارآفرینانه"],
+                                    ["H3", "شناسایی فرصت بر قصد کارآفرینانه دانشجویان تأثیر مثبت دارد.", "شناسایی فرصت ← قصد کارآفرینانه"],
+                                    ["H4", "شناسایی فرصت در رابطه بین آموزش اثرسازی و قصد کارآفرینانه نقش میانجی دارد.", "آموزش اثرسازی ← شناسایی فرصت ← قصد کارآفرینانه"]
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    id: "ch-3",
+                    number: 3,
+                    planetId: "planet-3",
+                    title: "روش‌شناسی پژوهش",
+                    shortTitle: "روش‌شناسی",
+                    color: "#34d399",
+                    orbitRadius: 420,
+                    planetSize: 52,
+                    description: "طرح پژوهش، جامعه و نمونه آماری، ابزار گردآوری داده‌ها و جریان تحلیل تلفیقی.",
+                    moons: [
+                        {
+                            id: "m-3-1",
+                            title: "۱. طرح و رویکرد پژوهش",
+                            shortTitle: "طرح پژوهش",
+                            description: "پژوهش کمّی، توصیفی-پیمایشی و کاربردی با رویکرد تحلیل ترکیبی.",
+                            contentType: "text",
+                            content: "این پژوهش از نظر هدف کاربردی و از نظر روش گردآوری داده‌ها، پیمایشی است. برای تحلیل متغیرها از رویکرد ترکیبی <span class='ltr-term'>PLS-SEM</span> (ارزیابی اثرات متقابل خطی) و <span class='ltr-term'>fsQCA</span> (شناسایی ترکیبات شرطی غیرخطی) استفاده شده است."
+                        },
+                        {
+                            id: "m-3-2",
+                            title: "۲. جامعه، نمونه و ابزار گردآوری",
+                            shortTitle: "جامعه و نمونه",
+                            description: "اطلاعات آماری شرکت‌کنندگان و ابزار سنجش.",
+                            contentType: "metrics",
+                            content: "اطلاعات گردآوری‌شده از طریق پرسشنامه استاندارد با مقیاس ۵ درجه‌ای لیکرت.",
+                            data: {
+                                stats: [
+                                    { label: "جامعه آماری", value: "دانشجویان" },
+                                    { label: "حجم نمونه (N)", value: "ورودی کاربر" },
+                                    { label: "نرخ بازگشت", value: "ورودی کاربر" },
+                                    { label: "ابزار سنجش", value: "پرسشنامه" }
+                                ]
+                            }
+                        },
+                        {
+                            id: "m-3-3",
+                            title: "۳. جریان بصری مراحل تحلیل",
+                            shortTitle: "جریان تحلیل",
+                            description: "مراحل گام‌به‌گام از گردآوری داده تا تلفیق نتایج.",
+                            contentType: "text",
+                            content: "گردآوری داده‌ها ← بررسی داده‌های پرت و نرمال‌سازی ← تحلیل مدل اندازه‌گیری PLS ← تحلیل مدل ساختاری PLS ← کالیبراسیون داده‌ها در fsQCA ← تحلیل شرایط لازم و جدول حقیقت ← تلفیق یافته‌ها."
+                        }
+                    ]
+                },
+                {
+                    id: "ch-4",
+                    number: 4,
+                    planetId: "planet-4",
+                    title: "مدل اندازه‌گیری در PLS-SEM",
+                    shortTitle: "مدل اندازه‌گیری",
+                    color: "#f472b6",
+                    orbitRadius: 520,
+                    planetSize: 56,
+                    description: "ارزیابی بارهای عاملی، پایایی (آلفای کرونباخ و پایایی ترکیبی)، روایی همگرا (AVE) و روایی واگرا (HTMT).",
+                    moons: [
+                        {
+                            id: "m-4-1",
+                            title: "۱. بارهای عاملی و پایایی سازه‌ها",
+                            shortTitle: "پایایی و بارهای عاملی",
+                            description: "بررسی بارهای عاملی گویه‌ها (حدآستانه ۰.۷) و آلفای کرونباخ.",
+                            contentType: "metrics",
+                            content: "معیارهای ارزیابی مدل اندازه‌گیری انعکاسی در PLS-SEM.",
+                            data: {
+                                stats: [
+                                    { label: "معیار بار عاملی", value: "> 0.70" },
+                                    { label: "آلفای کرونباخ", value: "> 0.70" },
+                                    { label: "پایایی ترکیبی (CR)", value: "> 0.70" }
+                                ]
+                            }
+                        },
+                        {
+                            id: "m-4-2",
+                            title: "۲. روایی همگرا (AVE)",
+                            shortTitle: "روایی همگرا",
+                            description: "ارزیابی میانگین واریانس استخراج‌شده (AVE) برای هر سازه.",
+                            contentType: "table",
+                            content: "شاخص‌های AVE محاسبه‌شده برای سازه‌های پژوهش (حد پذیرش حداقل ۰.۵۰):",
+                            data: {
+                                headers: ["سازه پژوهش", "آلفای کرونباخ", "پایایی ترکیبی (CR)", "میانگین واریانس (AVE)"],
+                                rows: [
+                                    ["آموزش اثرسازی", "داده واقعی وارد نشده", "داده واقعی وارد نشده", "داده واقعی وارد نشده"],
+                                    ["شناسایی فرصت", "داده واقعی وارد نشده", "داده واقعی وارد نشده", "داده واقعی وارد نشده"],
+                                    ["قصد کارآفرینانه", "داده واقعی وارد نشده", "داده واقعی وارد نشده", "داده واقعی وارد نشده"]
+                                ]
+                            }
+                        },
+                        {
+                            id: "m-4-3",
+                            title: "۳. روایی واگرا (معیار HTMT)",
+                            shortTitle: "روایی واگرا",
+                            description: "بررسی ماتریس نسبت هتروتریت-مونوتریت (HTMT).",
+                            contentType: "text",
+                            content: "برای احراز روایی واگرا، مقادیر جدول <span class='ltr-term'>HTMT</span> باید کمتر از حدآستانه ۰.۸۵ یا ۰.۹۰ باشند. مقادیر محاسبه‌شده واقعی پس از ورود یافته‌های پایان‌نامه در این بخش بروزرسانی می‌شوند."
+                        }
+                    ]
+                },
+                {
+                    id: "ch-5",
+                    number: 5,
+                    planetId: "planet-5",
+                    title: "مدل ساختاری و آزمون فرضیه‌ها",
+                    shortTitle: "مدل ساختاری",
+                    color: "#fb923c",
+                    orbitRadius: 620,
+                    planetSize: 62,
+                    description: "ضرایب مسیر (Path Coefficients)، آماره t، ضریب تعیین (R²)، اندازه اثر (f²) و پیش‌بینی‌پذیری (Q²).",
+                    moons: [
+                        {
+                            id: "m-5-1",
+                            title: "۱. نمودار مسیر و ضرایب ساختاری",
+                            shortTitle: "نمودار مسیر",
+                            description: "نمایش گرافیکی روابط ساختاری و وضعیت آزمون فرضیه‌ها.",
+                            contentType: "model",
+                            content: "ضرایب مسیر و آماره t در مدل تجربی PLS-SEM (روی فلش‌ها کلیک کنید):",
+                            data: {
+                                nodes: ["آموزش اثرسازی", "شناسایی فرصت", "قصد کارآفرینانه"],
+                                relationships: [
+                                    { from: "آموزش اثرسازی", to: "شناسایی فرصت", label: "H1", desc: "رابطه اثرسازی بر شناسایی فرصت (ضریب β و آماره t پس از ورود داده‌ها)" },
+                                    { from: "آموزش اثرسازی", to: "قصد کارآفرینانه", label: "H2", desc: "رابطه اثرسازی بر قصد کارآفرینانه (ضریب β و آماره t پس از ورود داده‌ها)" },
+                                    { from: "شناسایی فرصت", to: "قصد کارآفرینانه", label: "H3", desc: "رابطه شناسایی فرصت بر قصد کارآفرینانه (ضریب β و آماره t پس از ورود داده‌ها)" }
+                                ]
+                            }
+                        },
+                        {
+                            id: "m-5-2",
+                            title: "۲. جدول خلاصه نتایج آزمون فرضیه‌ها",
+                            shortTitle: "نتایج فرضیه‌ها",
+                            description: "جدول جامع ضرایب، آماره t، p-value و نتیجه نهایی هر فرضیه.",
+                            contentType: "table",
+                            content: "خلاصه ارزیابی مدل ساختاری:",
+                            data: {
+                                headers: ["فرضیه", "مسیر رابطه", "ضریب مسیر (β)", "آماره t", "p-value", "نتیجه فرضیه"],
+                                rows: [
+                                    ["H1", "اثرسازی ← شناسایی فرصت", "-", "-", "-", "در انتظار ورود داده"],
+                                    ["H2", "اثرسازی ← قصد کارآفرینانه", "-", "-", "-", "در انتظار ورود داده"],
+                                    ["H3", "شناسایی فرصت ← قصد کارآفرینانه", "-", "-", "-", "در انتظار ورود داده"],
+                                    ["H4", "اثرسازی ← شناسایی فرصت ← قصد کارآفرینانه", "-", "-", "-", "در انتظار ورود داده"]
+                                ]
+                            }
+                        },
+                        {
+                            id: "m-5-3",
+                            title: "۳. شاخص‌های R²، f² و Q²",
+                            shortTitle: "شاخص‌های برازش",
+                            description: "قدرت پیش‌بینی و اندازه اثر مدل ساختاری.",
+                            contentType: "metrics",
+                            content: "ارزیابی قدرتمندی مدل ساختاری:",
+                            data: {
+                                stats: [
+                                    { label: "R² قصد کارآفرینانه", value: "نامشخص" },
+                                    { label: "R² شناسایی فرصت", value: "نامشخص" },
+                                    { label: "Q² پیش‌بینی‌پذیری", value: "نامشخص" }
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    id: "ch-6",
+                    number: 6,
+                    planetId: "planet-6",
+                    title: "تحلیل پیکربندی با fsQCA",
+                    shortTitle: "تحلیل fsQCA",
+                    color: "#c084fc",
+                    orbitRadius: 720,
+                    planetSize: 58,
+                    description: "کالیبراسیون داده‌ها، تحلیل شرایط لازم، جدول حقیقت و استخراج پیکربندی‌های منتهی به قصد کارآفرینانه.",
+                    moons: [
+                        {
+                            id: "m-6-1",
+                            title: "۱. منطق تحلیل پیکربندی و کالیبراسیون",
+                            shortTitle: "کالیبراسیون",
+                            description: "تبدیل متغیرها به درجات عضویت مجموعه‌های فازی (نقاط آستانه ۰.۹۵، ۰.۵۰ و ۰.۰۵).",
+                            contentType: "text",
+                            content: "در روش <span class='ltr-term'>fsQCA</span>، برخلاف روش‌های متغیرمحور، پیامدها حاصل ترکیب پیچیده شرایط (<span class='ltr-term'>Causal Recipes</span>) هستند. در گام اول داده‌ها بر اساس ۳ نقطه آستانه عضویتی کالیبره شده‌اند."
+                        },
+                        {
+                            id: "m-6-2",
+                            title: "۲. جدول حقیقت و پیکربندی‌های منتهی به پیامد",
+                            shortTitle: "پیکربندی‌ها (Configurations)",
+                            description: "آرایش شروط کافی منتهی به قصد کارآفرینانه بالا.",
+                            contentType: "configuration",
+                            content: "راه‌حل‌های ترکیبی استخراج‌شده از fsQCA:",
+                            data: {
+                                conditions: ["اصل پر در دست", "زیان قابل تحمل", "شراکت راهبردی", "اهرم‌سازی سورپرایز"],
+                                rawConfigurations: [
+                                    { id: "S1", name: "پیکربندی ۱", consistency: "-", rawCoverage: "-", uniqueCoverage: "-", presence: [true, true, null, false] },
+                                    { id: "S2", name: "پیکربندی ۲", consistency: "-", rawCoverage: "-", uniqueCoverage: "-", presence: [true, null, true, true] }
+                                ]
+                            }
+                        },
+                        {
+                            id: "m-6-3",
+                            title: "۳. شاخص‌های سازگاری (Consistency) و پوشش (Coverage)",
+                            shortTitle: "سازگاری و پوشش",
+                            description: "بررسی کیفیت راه‌حل‌های fsQCA (حدآستانه سازگاری حداقل ۰.۸۰).",
+                            contentType: "metrics",
+                            content: "شاخص‌های کلی راه‌حل ترکیبی (<span class='ltr-term'>Overall Solution</span>):",
+                            data: {
+                                stats: [
+                                    { label: "سازگاری کلی (Solution Consistency)", value: "-" },
+                                    { label: "پوشش کلی (Solution Coverage)", value: "-" },
+                                    { label: "تعداد پیکربندی‌های اصلی", value: "-" }
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    id: "ch-7",
+                    number: 7,
+                    planetId: "planet-7",
+                    title: "تلفیق یافته‌ها و نتیجه‌گیری",
+                    shortTitle: "تلفیق و نتیجه‌گیری",
+                    color: "#2dd4bf",
+                    orbitRadius: 820,
+                    planetSize: 60,
+                    description: "جمع‌بندی تلفیقی PLS-SEM و fsQCA، دستاوردهای نظری، پیامدهای کاربردی و پیشنهادها.",
+                    moons: [
+                        {
+                            id: "m-7-1",
+                            title: "۱. مقایسه و تلفیق یافته‌های PLS-SEM و fsQCA",
+                            shortTitle: "تلفیق متدولوژی‌ها",
+                            description: "چگونه PLS اثرات خالص و fsQCA ترکیب‌های مکمل را تبیین می‌کنند.",
+                            contentType: "text",
+                            content: "تحلیل <span class='ltr-term'>PLS-SEM</span> نشان می‌دهد که کدام ابعاد اثرسازی به‌صورت مستقیم یا غیرمستقیم بیشترین نقش را دارند، در حالی که <span class='ltr-term'>fsQCA</span> ثابت می‌کند هیچ شرط منفردی برای قصد کارآفرینانه کافی نیست و مسیرهای جایگزین متعددی وجود دارد."
+                        },
+                        {
+                            id: "m-7-2",
+                            title: "۲. پیامدهای کاربردی و مدیریتی",
+                            shortTitle: "پیامدهای کاربردی",
+                            description: "توصیه‌های اجرایی برای سیاست‌گذاران و مربیان آموزش کارآفرینی.",
+                            contentType: "text",
+                            content: "• بازطراحی سرفصل‌های دروس کارآفرینی دانشگاه‌ها با تاکید بر کارگاه‌های عمل‌گرایانه اثرسازی.<br>• تشویق دانشجویان به شروع با امکانات موجود (Bird-in-Hand) به‌جای انتظار برای تامین سرمایه‌های کلان اولیه."
+                        },
+                        {
+                            id: "m-7-3",
+                            title: "۳. محدودیت‌ها و پیشنهادهای پژوهشی",
+                            shortTitle: "محدودیت‌ها و پیشنهادها",
+                            description: "مسیرهای آینده برای توسعه دانش در این حوزه.",
+                            contentType: "text",
+                            content: "• پیشنهاد بررسی طولی (<span class='ltr-term'>Longitudinal</span>) تغییرات قصد و رفتار واقعی کارآفرینانه پس از گذشت زمان.<br>• سنجش متغیرهای تعدیل‌گر مانند فرهنگ دانشگاهی و هوش هیجانی."
+                        }
+                    ]
+                }
+            ]
+        };
+
+        // Application Controller
+        document.addEventListener("DOMContentLoaded", () => {
+            initDataView();
+            initSolarStage();
+            initRenderSections();
+            initNavigationEvents();
+            initScrollZoomEngine();
+            initModalEvents();
+            initKeyboardShortcuts();
+        });
+
+        // 1. Fill Hero & Meta Information
+        function initDataView() {
+            document.getElementById("thesis-main-title").innerText = RESEARCH_DATA.meta.title;
+            document.getElementById("thesis-summary").innerHTML = RESEARCH_DATA.meta.summary;
+            document.getElementById("meta-researcher").innerText = RESEARCH_DATA.meta.researcher;
+            document.getElementById("meta-supervisor").innerText = RESEARCH_DATA.meta.supervisor;
+            document.getElementById("meta-university").innerText = RESEARCH_DATA.meta.university;
+            document.getElementById("meta-year").innerText = RESEARCH_DATA.meta.year;
+
+            const tagsContainer = document.getElementById("core-concepts-tags");
+            tagsContainer.innerHTML = RESEARCH_DATA.meta.coreConcepts.map(c =>
+                `<span class="tag-pill">${c}</span>`
+            ).join("");
+        }
+
+        // 2. Initialize Visual Solar System (Orbits, Planets & Moons)
+        function initSolarStage() {
+            const stage = document.getElementById("solar-system-stage");
+            const navList = document.getElementById("nav-chapters-list");
+            navList.innerHTML = "";
+
+            RESEARCH_DATA.chapters.forEach((ch, idx) => {
+                // Nav Item
+                const navLi = document.createElement("li");
+                navLi.className = "nav-item";
+                navLi.id = `nav-link-${ch.id}`;
+                navLi.innerText = `${ch.number}. ${ch.shortTitle}`;
+                navLi.onclick = () => scrollToChapter(ch.id);
+                navList.appendChild(navLi);
+
+                // Orbit Circle
+                const orbit = document.createElement("div");
+                orbit.className = "orbit-line";
+                orbit.id = `orbit-${ch.id}`;
+                const diameter = ch.orbitRadius * 2;
+                orbit.style.width = `${diameter}px`;
+                orbit.style.height = `${diameter}px`;
+                stage.appendChild(orbit);
+
+                // Planet
+                const angle = (idx / RESEARCH_DATA.chapters.length) * (2 * Math.PI) - (Math.PI / 2);
+                const px = Math.cos(angle) * ch.orbitRadius;
+                const py = Math.sin(angle) * ch.orbitRadius;
+
+                const planet = document.createElement("div");
+                planet.className = "planet-node";
+                planet.id = `planet-${ch.id}`;
+                planet.style.width = `${ch.planetSize}px`;
+                planet.style.height = `${ch.planetSize}px`;
+                planet.style.marginTop = `${-ch.planetSize/2}px`;
+                planet.style.marginLeft = `${-ch.planetSize/2}px`;
+                planet.style.background = `radial-gradient(circle at 30% 30%, #ffffff 0%, ${ch.color} 60%, #000 100%)`;
+                planet.style.color = ch.color;
+
+                // Store position data
+                planet.dataset.x = px;
+                planet.dataset.y = py;
+                planet.style.transform = `translate3d(${px}px, ${py}px, 0px)`;
+
+                planet.innerHTML = `
+                    <div class="planet-label">فصل ${ch.number}: ${ch.shortTitle}</div>
+                `;
+                planet.onclick = () => scrollToChapter(ch.id);
+                stage.appendChild(planet);
+
+                // Moons
+                if (ch.moons && ch.moons.length > 0) {
+                    ch.moons.forEach((m, mIdx) => {
+                        const mAngle = (mIdx / ch.moons.length) * (2 * Math.PI);
+                        const mDist = (ch.planetSize / 2) + 22;
+                        const mx = px + Math.cos(mAngle) * mDist;
+                        const my = py + Math.sin(mAngle) * mDist;
+
+                        const moon = document.createElement("div");
+                        moon.className = "moon-node";
+                        moon.id = `moon-${m.id}`;
+                        moon.style.marginTop = "-13px";
+                        moon.style.marginLeft = "-13px";
+                        moon.style.transform = `translate3d(${mx}px, ${my}px, 0px)`;
+                        moon.innerText = mIdx + 1;
+                        moon.title = m.title;
+                        moon.onclick = (e) => {
+                            e.stopPropagation();
+                            scrollToChapter(ch.id);
+                        };
+                        stage.appendChild(moon);
+                    });
+                }
+            });
+        }
+
+        // 3. Render Narrative Chapter Content
+        function initRenderSections() {
+            const container = document.getElementById("chapters-content-container");
+            container.innerHTML = "";
+
+            RESEARCH_DATA.chapters.forEach(ch => {
+                const section = document.createElement("section");
+                section.className = "scroll-section chapter-container";
+                section.id = `section-${ch.id}`;
+                section.style.setProperty("--chapter-accent", ch.color);
+
+                let moonsHtml = ch.moons.map(m => renderMoonCard(m, ch.color)).join("");
+
+                section.innerHTML = `
+                    <div class="chapter-header-card">
+                        <h2>
+                            <span>فصل ${ch.number}: ${ch.title}</span>
+                            <span class="chapter-badge">فصل ${ch.number} از ${RESEARCH_DATA.chapters.length}</span>
+                        </h2>
+                        <p style="color: var(--text-muted); font-size: 0.95rem;">${ch.description}</p>
+                    </div>
+                    <div class="moons-grid">
+                        ${moonsHtml}
+                    </div>
+                `;
+                container.appendChild(section);
+            });
+        }
+
+        // Render Moon Card based on Content Type
+        function renderMoonCard(moon, accentColor) {
+            let bodyContent = `<p>${moon.content}</p>`;
+
+            if (moon.contentType === "metrics" && moon.data && moon.data.stats) {
+                const statsHtml = moon.data.stats.map(s => `
+                    <div class="stat-box">
+                        <div class="val" style="color: ${accentColor}">${s.value}</div>
+                        <div class="lbl">${s.label}</div>
+                    </div>
+                `).join("");
+                bodyContent += `<div class="stats-grid">${statsHtml}</div>`;
+            } else if (moon.contentType === "table" && moon.data && moon.data.headers) {
+                const headersHtml = moon.data.headers.map(h => `<th>${h}</th>`).join("");
+                const rowsHtml = moon.data.rows.map(r => `
+                    <tr>${r.map(cell => `<td>${cell}</td>`).join("")}</tr>
+                `).join("");
+                bodyContent += `
+                    <div style="overflow-x: auto;">
+                        <table class="data-table">
+                            <thead><tr>${headersHtml}</tr></thead>
+                            <tbody>${rowsHtml}</tbody>
+                        </table>
+                    </div>
+                `;
+            } else if (moon.contentType === "model" && moon.data) {
+                bodyContent += renderSvgModelDiagram(moon.data, accentColor);
+            } else if (moon.contentType === "configuration" && moon.data) {
+                bodyContent += renderFsqcaConfigurationTable(moon.data);
+            }
+
+            return `
+                <div class="moon-card" id="card-${moon.id}">
+                    <div>
+                        <h3>
+                            <span>${moon.title}</span>
+                            <span style="font-size: 0.75rem; color: var(--text-muted);">${moon.shortTitle}</span>
+                        </h3>
+                        <p style="font-size: 0.88rem; color: var(--text-muted);">${moon.description}</p>
+                        ${bodyContent}
+                    </div>
+                </div>
+            `;
+        }
+
+        // SVG Conceptual & Path Model Renderer
+        function renderSvgModelDiagram(modelData, accentColor) {
+            return `
+                <div class="svg-diagram-container">
+                    <svg viewBox="0 0 500 160" width="100%" height="160">
+                        <defs>
+                            <marker id="arrow-${accentColor.replace('#','')}" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                                <path d="M 0 0 L 10 5 L 0 10 z" fill="${accentColor}" />
+                            </marker>
+                        </defs>
+                        <!-- Node 1: Effectuation -->
+                        <rect class="interactive-node" x="20" y="55" width="120" height="50" rx="8" fill="#0f172a" stroke="${accentColor}" stroke-width="2" onclick="showModalInfo('آموزش اثرسازی', 'متغیر مستقل اصلی شامل ۵ اصل کلیدی تصمیم‌گیری کارآفرینانه ساراسواتی.')"/>
+                        <text x="80" y="85" fill="#ffffff" font-size="11" text-anchor="middle" font-family="Tahoma" pointer-events="none">آموزش اثرسازی</text>
+
+                        <!-- Node 2: Opp Identification -->
+                        <rect class="interactive-node" x="190" y="15" width="120" height="50" rx="8" fill="#0f172a" stroke="${accentColor}" stroke-width="2" onclick="showModalInfo('شناسایی فرصت', 'متغیر میانجی در مدل مفهومی که نقش کاتالیزور بین آموزش و قصد را دارد.')"/>
+                        <text x="250" y="45" fill="#ffffff" font-size="11" text-anchor="middle" font-family="Tahoma" pointer-events="none">شناسایی فرصت</text>
+
+                        <!-- Node 3: Ent Intention -->
+                        <rect class="interactive-node" x="360" y="55" width="120" height="50" rx="8" fill="#0f172a" stroke="${accentColor}" stroke-width="2" onclick="showModalInfo('قصد کارآفرینانه', 'متغیر وابسته نهایی نشان‌دهنده تمایل دانشجو به راه‌اندازی کسب‌وکار.')"/>
+                        <text x="420" y="85" fill="#ffffff" font-size="11" text-anchor="middle" font-family="Tahoma" pointer-events="none">قصد کارآفرینانه</text>
+
+                        <!-- Path 1: Effectuation -> Opp Ident -->
+                        <path class="interactive-path" d="M 140 70 Q 165 40 190 40" fill="none" stroke="${accentColor}" stroke-width="2" marker-end="url(#arrow-${accentColor.replace('#','')})" onclick="showModalInfo('مسیر H1', '${modelData.relationships[0]?.desc || 'رابطه H1'}')"/>
+
+                        <!-- Path 2: Effectuation -> Ent Intention -->
+                        <path class="interactive-path" d="M 140 80 L 360 80" fill="none" stroke="${accentColor}" stroke-width="2" stroke-dasharray="4" marker-end="url(#arrow-${accentColor.replace('#','')})" onclick="showModalInfo('مسیر H2', '${modelData.relationships[1]?.desc || 'رابطه H2'}')"/>
+
+                        <!-- Path 3: Opp Ident -> Ent Intention -->
+                        <path class="interactive-path" d="M 310 40 Q 335 40 360 70" fill="none" stroke="${accentColor}" stroke-width="2" marker-end="url(#arrow-${accentColor.replace('#','')})" onclick="showModalInfo('مسیر H3', '${modelData.relationships[2]?.desc || 'رابطه H3'}')"/>
+                    </svg>
+                </div>
+            `;
+        }
+
+        // fsQCA Configuration Matrix Renderer
+        function renderFsqcaConfigurationTable(qcaData) {
+            const condHeaders = qcaData.conditions.map(c => `<th>${c}</th>`).join("");
+            const rows = qcaData.rawConfigurations.map(cfg => {
+                const presenceCells = cfg.presence.map(p => {
+                    if (p === true) return `<td><span class="qca-symbol qca-present" title="حضور شرط">●</span></td>`;
+                    if (p === false) return `<td><span class="qca-symbol qca-absent" title="غیاب شرط">⊗</span></td>`;
+                    return `<td><span class="qca-symbol qca-dontcare" title="بی‌تفاوت">○</span></td>`;
+                }).join("");
+
+                return `
+                    <tr>
+                        <td style="font-weight: bold; color: var(--color-sun);">${cfg.name}</td>
+                        ${presenceCells}
+                        <td dir="ltr">${cfg.consistency}</td>
+                        <td dir="ltr">${cfg.rawCoverage}</td>
+                    </tr>
+                `;
+            }).join("");
+
+            return `
+                <div style="overflow-x: auto;">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>پیکربندی</th>
+                                ${condHeaders}
+                                <th>سازگاری</th>
+                                <th>پوشش خام</th>
+                            </tr>
+                        </thead>
+                        <tbody>${rows}</tbody>
+                    </table>
+                </div>
+                <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 8px; display: flex; gap: 15px; justify-content: center;">
+                    <span>● حضور شرط</span>
+                    <span>⊗ غیاب شرط</span>
+                    <span>○ عدم بعد تعیین‌کننده</span>
+                </div>
+            `;
+        }
+
+        // 4. Navigation Events & Controls
+        function initNavigationEvents() {
+            document.getElementById("btn-brand-home").onclick = () => scrollToTop();
+            document.getElementById("btn-reset-view").onclick = () => scrollToTop();
+            document.getElementById("btn-start-journey").onclick = () => scrollToChapter("ch-1");
+            document.getElementById("sun-element").onclick = () => scrollToTop();
+
+            const kbdBtn = document.getElementById("kbd-help-btn");
+            const kbdModal = document.getElementById("kbd-help-modal");
+            kbdBtn.onclick = () => {
+                kbdModal.style.display = (kbdModal.style.display === "block") ? "none" : "block";
+            };
+            document.getElementById("kbd-close").onclick = () => {
+                kbdModal.style.display = "none";
+            };
+        }
+
+        function initModalEvents() {
+            document.getElementById("modal-close").onclick = () => {
+                document.getElementById("detail-modal").style.display = "none";
+            };
+        }
+
+        function showModalInfo(title, body) {
+            const modal = document.getElementById("detail-modal");
+            document.getElementById("modal-title").innerText = title;
+            document.getElementById("modal-body").innerText = body;
+            modal.style.display = "block";
+        }
+
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function scrollToChapter(chId) {
+            const el = document.getElementById(`section-${chId}`);
+            if (el) {
+                const yOffset = -70;
+                const y = el.getBoundingClientRect().top + window.pageYOffset + yOffset;
+                window.scrollTo({ top: y, behavior: 'smooth' });
+            }
+        }
+
+        // Keyboard Navigation Shortcuts
+        function initKeyboardShortcuts() {
+            document.addEventListener("keydown", (e) => {
+                if (e.key === "Home" || e.key === "Escape") {
+                    scrollToTop();
+                } else if (e.key === "ArrowDown" || e.key === "PageDown") {
+                    navigateNextChapter(1);
+                } else if (e.key === "ArrowUp" || e.key === "PageUp") {
+                    navigateNextChapter(-1);
+                }
+            });
+        }
+
+        function navigateNextChapter(direction) {
+            const chapterIds = RESEARCH_DATA.chapters.map(c => c.id);
+            const currentSection = document.querySelector(".nav-item.active");
+            let currentIndex = -1;
+
+            if (currentSection) {
+                const activeId = currentSection.id.replace("nav-link-", "");
+                currentIndex = chapterIds.indexOf(activeId);
+            }
+
+            let nextIndex = currentIndex + direction;
+            if (nextIndex < 0) {
+                scrollToTop();
+            } else if (nextIndex < chapterIds.length) {
+                scrollToChapter(chapterIds[nextIndex]);
+            }
+        }
+
+        // 5. Scroll Zoom & Motion Engine
+        function initScrollZoomEngine() {
+            const stage = document.getElementById("solar-system-stage");
+            let isTicking = false;
+
+            window.addEventListener("scroll", () => {
+                if (!isTicking) {
+                    window.requestAnimationFrame(() => {
+                        updateCameraView();
+                        isTicking = false;
+                    });
+                    isTicking = true;
+                }
+            });
+
+            updateCameraView();
+        }
+
+        function updateCameraView() {
+            const stage = document.getElementById("solar-system-stage");
+            const scrollY = window.scrollY;
+            const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+            const progress = maxScroll > 0 ? Math.min(Math.max(scrollY / maxScroll, 0), 1) : 0;
+
+            document.getElementById("progress-fill").style.width = `${(progress * 100).toFixed(0)}%`;
+            document.getElementById("progress-text").innerText = `${(progress * 100).toFixed(0)}٪`;
+
+            const sections = document.querySelectorAll(".scroll-section");
+            let activeChId = null;
+
+            sections.forEach(sec => {
+                const rect = sec.getBoundingClientRect();
+                if (rect.top <= window.innerHeight * 0.45 && rect.bottom >= window.innerHeight * 0.2) {
+                    if (sec.id.startsWith("section-ch-")) {
+                        activeChId = sec.id.replace("section-", "");
+                    }
+                }
+            });
+
+            document.querySelectorAll(".nav-item").forEach(el => el.classList.remove("active"));
+            document.querySelectorAll(".planet-node").forEach(el => el.classList.remove("active-planet"));
+            document.querySelectorAll(".orbit-line").forEach(el => el.classList.remove("active"));
+
+            if (!activeChId || scrollY < 200) {
+                stage.style.transform = `scale(0.85) translate3d(0px, 0px, 0px) rotateX(15deg)`;
+            } else {
+                const activeNav = document.getElementById(`nav-link-${activeChId}`);
+                if (activeNav) activeNav.classList.add("active");
+
+                const activePlanet = document.getElementById(`planet-${activeChId}`);
+                const activeOrbit = document.getElementById(`orbit-${activeChId}`);
+
+                if (activePlanet) {
+                    activePlanet.classList.add("active-planet");
+                    if (activeOrbit) activeOrbit.classList.add("active");
+
+                    const px = parseFloat(activePlanet.dataset.x) || 0;
+                    const py = parseFloat(activePlanet.dataset.y) || 0;
+
+                    const zoomScale = 1.4;
+                    const transX = -px * zoomScale;
+                    const transY = -py * zoomScale;
+
+                    stage.style.transform = `scale(${zoomScale}) translate3d(${transX}px, ${transY}px, 0px)`;
+                }
+            }
+        }
+    </script>
+</body>
+</html>
